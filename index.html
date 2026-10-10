@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CapCut JSON to SRT Converter - Chuyển Đổi Phụ Đề Nhanh Chóng</title>
+  <meta name="description" content="Công cụ chuyển đổi file phụ đề draft_content.json từ CapCut và JianYing sang định dạng phụ đề SRT, VTT, TXT trực quan, bảo mật 100% offline ngay trên trình duyệt.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>CapCut Subtitle <span>Converter</span></h1>
+          <p>Chuyển đổi phụ đề <code>draft_content.json</code> (CapCut & JianYing) sang <code>.SRT</code>, <code>.VTT</code>, <code>.TXT</code></p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button id="btnPathGuide" class="btn btn-secondary" title="Xem hướng dẫn vị trí file trên máy">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+          Tìm file CapCut ở đâu?
+        </button>
+        <button id="btnLoadDemo" class="btn btn-outline" title="Tải thử file phụ đề mẫu để xem hoạt động">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Thử file mẫu
+        </button>
+      </div>
+    </header>
+
+    <!-- Path Finder Modal/Banner -->
+    <div id="pathModal" class="modal-overlay hidden">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <h3>Cách tìm file <code>draft_content.json</code></h3>
+          </div>
+          <button id="btnCloseModal" class="btn-close" aria-label="Đóng">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">CapCut lưu trữ toàn bộ nội dung phụ đề trong file <strong>draft_content.json</strong> bên trong thư mục dự án của bạn:</p>
+          
+          <div class="path-item">
+            <div class="path-label">
+              <span class="os-tag">Windows</span>
+              <span>Đường dẫn CapCut PC</span>
+            </div>
+            <div class="copy-input-group">
+              <input type="text" readonly value="%localappdata%\CapCut\User Data\Projects\com.lveditor.draft\" id="pathWinCapCut">
+              <button class="btn-copy" onclick="copyPath('pathWinCapCut', this)">Sao chép</button>
+            </div>
+            <small>Nhấn tổ hợp phím <code>Win + R</code>, dán đường dẫn trên và nhấn <code>Enter</code> để mở thư mục.</small>
+          </div>
+
+          <div class="path-item">
+            <div class="path-label">
+              <span class="os-tag">Windows</span>
+              <span>Đường dẫn JianYing (CapCut Trung Quốc)</span>
+            </div>
+            <div class="copy-input-group">
+              <input type="text" readonly value="%localappdata%\JianyingPro\User Data\Projects\com.lveditor.draft\" id="pathWinJianYing">
+              <button class="btn-copy" onclick="copyPath('pathWinJianYing', this)">Sao chép</button>
+            </div>
+          </div>
+
+          <div class="path-item">
+            <div class="path-label">
+              <span class="os-tag">macOS</span>
+              <span>Đường dẫn CapCut Mac</span>
+            </div>
+            <div class="copy-input-group">
+              <input type="text" readonly value="~/Movies/CapCut/User Data/Projects/com.lveditor.draft/" id="pathMacCapCut">
+              <button class="btn-copy" onclick="copyPath('pathMacCapCut', this)">Sao chép</button>
+            </div>
+          </div>
+
+          <div class="guide-tip">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span><strong>Mẹo:</strong> Trong thư mục dự án, tìm thư mục có tên video của bạn, bên trong sẽ có file <code>draft_content.json</code> (hoặc <code>draft_info.json</code> trên Mac). Kéo thả file đó vào đây!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Dropzone -->
+    <section class="dropzone-section">
+      <div id="dropzone" class="dropzone glass-card">
+        <input type="file" id="fileInput" accept=".json" multiple class="file-input-hidden">
+        
+        <div class="dropzone-icon-wrap">
+          <div class="pulse-ring"></div>
+          <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+            <path d="M12 12v9"></path>
+            <path d="m16 16-4-4-4 4"></path>
+          </svg>
+        </div>
+
+        <div class="dropzone-text">
+          <h2>Kéo và thả file <span>draft_content.json</span> vào đây</h2>
+          <p>Hoặc <button type="button" id="btnBrowse" class="link-btn">chọn file từ máy tính</button> (hỗ trợ nhiều file cùng lúc)</p>
+        </div>
+
+        <div class="badge-row">
+          <span class="format-badge active">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            CapCut PC
+          </span>
+          <span class="format-badge active">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            JianYing Pro
+          </span>
+          <span class="format-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            Whisper JSON
+          </span>
+          <span class="format-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            YouTube JSON
+          </span>
+          <span class="format-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            100% Offline Bảo Mật
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- File Selector Bar (for Multi-file batch) -->
+    <div id="fileTabsContainer" class="file-tabs-bar hidden">
+      <span class="tabs-label">Danh sách file đã nạp:</span>
+      <div id="fileTabsList" class="tabs-list"></div>
+      <button id="btnBatchDownload" class="btn btn-sm btn-outline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Tải tất cả SRT
+      </button>
+    </div>
+
+    <!-- Main Workspace (Hidden until file parsed) -->
+    <main id="workspace" class="workspace hidden">
+      <!-- Stats Overview Cards -->
+      <section class="stats-grid">
+        <div class="stat-card glass-card">
+          <div class="stat-icon purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Tổng số câu phụ đề</span>
+            <span id="statCount" class="stat-val">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Tổng thời lượng</span>
+            <span id="statDuration" class="stat-val">00:00:00</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-icon emerald">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Tổng số từ</span>
+            <span id="statWords" class="stat-val">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-icon amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">File nguồn</span>
+            <span id="statFileName" class="stat-val text-truncate">draft_content.json</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Toolbar & Action Controls -->
+      <section class="controls-bar glass-card">
+        <div class="controls-left">
+          <!-- Search Box -->
+          <div class="search-input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm nội dung phụ đề...">
+            <span id="searchBadge" class="search-count-badge hidden">0 kết quả</span>
+          </div>
+
+          <!-- Time Offset Tool -->
+          <div class="offset-tool-wrap">
+            <label for="offsetInput" title="Dịch chuyển thời gian phụ đề sớm hoặc trễ">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Lệch thời gian:
+            </label>
+            <div class="offset-input-group">
+              <input type="number" id="offsetInput" value="0" step="100" placeholder="0">
+              <span class="unit">ms</span>
+              <button id="btnApplyOffset" class="btn btn-xs btn-outline" title="Áp dụng dịch thời gian">Áp dụng</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <!-- Export Buttons -->
+          <button id="btnDownloadSrt" class="btn btn-primary" title="Tải file phụ đề chuẩn SubRip (.srt)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Tải file .SRT
+          </button>
+
+          <button id="btnDownloadVtt" class="btn btn-secondary" title="Tải file định dạng WebVTT (.vtt)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Tải .VTT
+          </button>
+
+          <button id="btnDownloadTxt" class="btn btn-secondary" title="Tải văn bản thuần không kèm mốc giờ (.txt)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            Tải .TXT
+          </button>
+
+          <button id="btnCopySrt" class="btn btn-outline" title="Sao chép nội dung SRT vào bộ nhớ tạm">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Sao chép
+          </button>
+        </div>
+      </section>
+
+      <!-- Subtitle Editor & Table -->
+      <section class="subtitle-table-container glass-card">
+        <div class="table-header-bar">
+          <div class="table-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+            <h3>Danh sách câu phụ đề (Có thể chỉnh sửa trực tiếp)</h3>
+          </div>
+          <div class="table-actions">
+            <button id="btnAddSubtitle" class="btn btn-xs btn-outline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Thêm dòng
+            </button>
+            <button id="btnClearAll" class="btn btn-xs btn-danger-outline">Xóa tất cả</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="subtitle-table" id="subtitleTable">
+            <thead>
+              <tr>
+                <th width="60">STT</th>
+                <th width="140">Bắt đầu</th>
+                <th width="140">Kết thúc</th>
+                <th width="100">Thời lượng</th>
+                <th>Nội dung phụ đề</th>
+                <th width="70" class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="subtitleTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>CapCut Subtitle Converter &bull; 100% An toàn, xử lý nội bộ tại trình duyệt &bull; Không tải dữ liệu lên máy chủ</p>
+        <p class="footer-links">
+          <span>Kèm công cụ dòng lệnh: <code>capcut_to_srt.py</code></span>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <span id="toastMsg" class="toast-message">Đã sao chép thành công!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
